@@ -25,3 +25,4 @@ jobs:
             run: |
                dotnet restore ./Fase1TechChallenge.sln
                dotnet build --no-restore ./Fase1TechChallenge.sln
+               

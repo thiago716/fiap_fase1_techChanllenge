@@ -25,8 +25,14 @@ jobs:
                cache: true
                cache-dependency-path: './01_WebApi/packages.lock.json'
           
-          - name: Build
+          - name: Build and test
             run: |
                dotnet restore ./Fase1TechChallenge.sln
                dotnet build --no-restore ./Fase1TechChallenge.sln
+               dotnet test ./Fase1TechChallenge.sln --no-restore --no-build --logger trx --results-directory "TestsResults"
+          
+          - uses: actions/upload-artifact@v4
+            with:
+                name: dotenet-test-results
+                path: TestsResults
                

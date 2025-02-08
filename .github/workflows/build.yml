@@ -23,5 +23,5 @@ jobs:
           
           - name: Build
             run: |
-               dotnet restore ./src/Todo.Api.sln   
+               dotnet restore ./Fase1TechChallenge.sln
                dotnet build --no-restore ./Fase1TechChallenge.sln

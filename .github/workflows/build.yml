@@ -14,9 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     name: Build Project
     steps:
+      # Checkout código
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Configuração do ambiente .NET Core
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
@@ -24,6 +26,7 @@ jobs:
           cache: true
           cache-dependency-path: './01_WebApi/packages.lock.json'
 
+      # Restauração e compilação
       - name: Restore and Build
         run: |
           dotnet restore ./Fase1TechChallenge.sln
@@ -34,17 +37,22 @@ jobs:
     name: Test Project
     needs: build
     steps:
+      # Checkout código novamente no job de teste
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Configuração do ambiente .NET Core no job de teste
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
+      # Executar testes e coletar resultados
       - name: Run Tests
-        run: dotnet test ./Fase1TechChallenge.sln --no-restore --no-build --logger trx --results-directory "TestsResults"
+        run: |
+          dotnet test ./05_UnitTest/05_UnitTest.csproj --logger trx --results-directory "TestsResults" --no-restore --no-build
 
+      # Upload dos resultados dos testes
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:

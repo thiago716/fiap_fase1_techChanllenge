@@ -14,18 +14,18 @@ jobs:
 
     steps:
       - name: Checkout repository # Passo para fazer checkout do repositório
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Set up .NET # Passo para configurar a versão do .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '8.x' # A versão do .NET a ser utilizada (ajuste conforme necessário)
 
       - name: Cache NuGet packages # Passo para armazenar o cache de pacotes NuGet
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.sln') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
 

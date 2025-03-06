@@ -50,7 +50,7 @@ jobs:
       # Executar testes e coletar resultados
       - name: Run Tests
         run: |
-          dotnet test ./05_UnitTest/05_UnitTest.csproj --logger trx --results-directory "TestsResults" --no-restore --no-build
+          dotnet test ./05_UnitTest/05_UnitTest.csproj --logger trx --results-directory "TestsResults" --no-restore --no-build --collect "Code Coverage"
 
       # Upload dos resultados dos testes
       - name: Upload Test Results

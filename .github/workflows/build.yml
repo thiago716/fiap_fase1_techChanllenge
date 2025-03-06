@@ -1,13 +1,12 @@
-name: primeiro workflow Projeto techchanllenge GitHub Actions para Build Project
+name: Projeto TechChallenge CI
 
 on:
   push:
     branches:
       - main
   pull_request:
-     branches:
-       - main
-       
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -15,24 +14,39 @@ jobs:
     runs-on: ubuntu-latest
     name: Build Project
     steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-          - name: Setup .NET core
-            uses: actions/setup-dotnet@v4
-            with:
-               dotnet-version: '8.x'
-               cache: true
-               cache-dependency-path: './01_WebApi/packages.lock.json'
-          
-          - name: Build and test
-            run: |
-               dotnet restore ./Fase1TechChallenge.sln
-               dotnet build --no-restore ./Fase1TechChallenge.sln
-               dotnet test ./Fase1TechChallenge.sln --no-restore --no-build --logger trx --results-directory "TestsResults"
-          
-          - uses: actions/upload-artifact@v4
-            with:
-                name: dotenet-test-results
-                path: TestsResults
-               
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+          cache: true
+          cache-dependency-path: './01_WebApi/packages.lock.json'
+
+      - name: Restore and Build
+        run: |
+          dotnet restore ./Fase1TechChallenge.sln
+          dotnet build --no-restore ./Fase1TechChallenge.sln
+
+  test:
+    runs-on: ubuntu-latest
+    name: Test Project
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Run Tests
+        run: dotnet test ./Fase1TechChallenge.sln --no-restore --no-build --logger trx --results-directory "TestsResults"
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-test-results
+          path: TestsResults

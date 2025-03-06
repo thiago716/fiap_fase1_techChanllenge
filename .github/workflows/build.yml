@@ -1,38 +1,34 @@
-name: primeiro workflow Projeto techchanllenge GitHub Actions para Build Project
+name: .NET CI
 
 on:
   push:
     branches:
       - main
   pull_request:
-     branches:
-       - main
-       
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Build Project
-    steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
 
-          - name: Setup .NET core
-            uses: actions/setup-dotnet@v4
-            with:
-               dotnet-version: '8.x'
-               cache: true
-               cache-dependency-path: './01_WebApi/packages.lock.json'
-          
-          - name: Build and test
-            run: |
-               dotnet restore ./Fase1TechChallenge.sln
-               dotnet build --no-restore ./Fase1TechChallenge.sln
-               dotnet test ./Fase1TechChallenge.sln --no-restore --no-build --logger trx --results-directory "TestsResults"
-          
-          - uses: actions/upload-artifact@v4
-            with:
-                name: dotenet-test-results
-                path: TestsResults
-               
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run Unit Tests
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      - name: Run Integration Tests
+        run: dotnet test --configuration Release --no-build --filter Category=IntegrationTests

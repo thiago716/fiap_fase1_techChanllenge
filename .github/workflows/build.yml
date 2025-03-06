@@ -1,38 +1,64 @@
-name: primeiro workflow Projeto techchanllenge GitHub Actions para Build Project
+name: .NET CI
 
 on:
   push:
     branches:
       - main
   pull_request:
-     branches:
-       - main
-       
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    name: Build Project
-    steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
+    runs-on: ubuntu-latest # Especifica que o job deve ser executado em um ambiente Ubuntu
 
-          - name: Setup .NET core
-            uses: actions/setup-dotnet@v4
-            with:
-               dotnet-version: '8.x'
-               cache: true
-               cache-dependency-path: './01_WebApi/packages.lock.json'
-          
-          - name: Build and test
-            run: |
-               dotnet restore ./Fase1TechChallenge.sln
-               dotnet build --no-restore ./Fase1TechChallenge.sln
-               dotnet test ./Fase1TechChallenge.sln --no-restore --no-build --logger trx --results-directory "TestsResults"
-          
-          - uses: actions/upload-artifact@v4
-            with:
-                name: dotenet-test-results
-                path: TestsResults
-               
+    steps:
+      - name: Checkout repository # Passo para fazer checkout do repositório
+        uses: actions/checkout@v2
+
+      - name: Set up .NET # Passo para configurar a versão do .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.x' # A versão do .NET a ser utilizada (ajuste conforme necessário)
+
+      - name: Cache NuGet packages # Passo para armazenar o cache de pacotes NuGet
+        uses: actions/cache@v2
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.sln') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies # Passo para restaurar as dependências do projeto
+        run: dotnet restore
+
+      - name: Build # Passo para compilar o projeto
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run Unit Tests # Passo para executar os testes unitários
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      - name: Run Integration Tests # Passo para executar os testes de integração
+        run: dotnet test --configuration Release --no-build --filter Category=IntegrationTests
+
+      - name: Run Code Coverage # Passo para executar testes de cobertura, se aplicável
+        run: |
+          dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage"
+          # Dependendo do seu projeto, você pode precisar gerar um relatório de cobertura a partir dos dados coletados.
+
+      - name: Upload Coverage Results # Passo para fazer upload dos resultados de cobertura, se aplicável
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-results
+          path: '**/coverage.cobertura.xml' # Ajuste esse caminho conforme necessário
+
+      # Passo opcional para notificar sobre falhas
+      - name: Notify on failure # Opcional: notificar se algum passo falhar
+        if: failure()
+        run: |
+          echo "Build or tests failed. Review the logs for details."
+          # Você pode integrar notificações aqui, como Slack, email, etc. com APIs apropriadas.
+
+      # Limpeza de dependências e artefatos (opcional)
+      - name: Clean up # Passo para limpar dependências e artefatos de teste
+        run: dotnet clean

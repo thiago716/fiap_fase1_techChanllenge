@@ -10,25 +10,25 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Especifica que o job deve ser executado em um ambiente Ubuntu
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository # Passo para fazer checkout do repositório
         uses: actions/checkout@v2
 
-      - name: Set up .NET
+      - name: Set up .NET # Passo para configurar a versão do .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '8.x' # A versão do .NET a ser utilizada (ajuste conforme necessário)
 
-      - name: Restore dependencies
+      - name: Restore dependencies # Passo para restaurar as dependências do projeto
         run: dotnet restore
 
-      - name: Build
+      - name: Build # Passo para compilar o projeto
         run: dotnet build --configuration Release --no-restore
 
-      - name: Run Unit Tests
+      - name: Run Unit Tests # Passo para executar os testes unitários
         run: dotnet test --configuration Release --no-build --verbosity normal
 
-      - name: Run Integration Tests
+      - name: Run Integration Tests # Passo para executar os testes de integração
         run: dotnet test --configuration Release --no-build --filter Category=IntegrationTests

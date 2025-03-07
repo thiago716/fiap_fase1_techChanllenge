@@ -9,9 +9,6 @@ on:
       - main
   workflow_dispatch:
 
-#permissions:
-#  contents: write  # Adicione esta linha
-
 jobs:
 #add controle de vercionamento
   versionamento:
@@ -79,3 +76,22 @@ jobs:
         with:
           name: dotnet-test-results
           path: TestsResults
+
+  backend-lint:
+    needs: Backend-build-and-test
+    runs-on: ubuntu-latest
+    name: Backend Lint Project
+    
+    steps:
+              # Checkout código
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: github/super-linter@v6
+        env:
+          DEFAULT_BRANCH: "main"
+          VALIDATE_ALL_CODEBASE: "false"
+          VALIDATE_YAML: "true"
+          validate_csharp: "true"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

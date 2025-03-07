@@ -31,7 +31,7 @@ jobs:
 
       - name: Tag do repositorio
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.TESTE }}
         run: |
           echo "::notice:: ${{ steps.version.outputs.version }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"

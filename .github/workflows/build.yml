@@ -11,6 +11,30 @@ on:
   workflow_dispatch:
 
 jobs:
+#add controle de vercionamento
+  versionamento:
+    runs-on: ubuntu-latest
+    name: Versionamento
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0 #historico de commits, assim fazendo o recalculo da versão
+
+      - uses: codacy/git-version@2.8.0
+        with:
+          release-branch: main #podendo variar com main master
+          prefix: v
+
+      - name: Tag do repositorio
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::notice:: ${{ steps.git-version.outputs.version }}"
+
+
   build:
     runs-on: ubuntu-latest
     name: Build Project

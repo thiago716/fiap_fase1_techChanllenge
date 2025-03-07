@@ -10,6 +10,9 @@ on:
        
   workflow_dispatch:
 
+permissions:
+  contents: write  # Adicione esta linha
+
 jobs:
 #add controle de vercionamento
   versionamento:

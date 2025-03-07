@@ -47,9 +47,10 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # Executar testes e coletar resultados
-      - name: Run Tests
+      - name: Build and test
         run: |
+          dotnet restore ./Fase1TechChallenge.sln
+          dotnet build --no-restore ./Fase1TechChallenge.sln
           dotnet test ./Fase1TechChallenge.sln --no-restore --no-build --logger trx --results-directory "TestsResults"
 
       # Upload dos resultados dos testes

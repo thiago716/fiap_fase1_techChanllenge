@@ -67,7 +67,7 @@ jobs:
 
       - name: Build
         run: |
-          dotnet build --no-restore ./Fase1TechChallenge.sln
+          dotnet build --no-restore --configuration Release ./Fase1TechChallenge.sln
 
       - name: Test
         run: |

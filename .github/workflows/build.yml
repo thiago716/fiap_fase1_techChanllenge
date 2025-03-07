@@ -24,6 +24,7 @@ jobs:
           fetch-depth: 0 #historico de commits, assim fazendo o recalculo da versão
 
       - uses: codacy/git-version@2.8.0
+        id: version
         with:
           release-branch: main #podendo variar com main master
           prefix: v
@@ -32,7 +33,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "::notice:: ${{ steps.git-version.outputs.version }}"
+          echo "::notice:: ${{ steps.version.outputs.version }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
+          git tag -a "${{ steps.version.outputs.version }}" -m "Release ${{ steps.version.outputs.version }}"
+          git push --tags
+          if: github.ref == 'refs/heads/main'
 
 
   build:

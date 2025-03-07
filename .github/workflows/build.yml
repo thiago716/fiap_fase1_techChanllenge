@@ -9,8 +9,8 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  contents: write  # Adicione esta linha
+#permissions:
+#  contents: write  # Adicione esta linha
 
 jobs:
 #add controle de vercionamento
@@ -33,7 +33,6 @@ jobs:
 
       - name: Tag do repositorio
         env:
-          #GH_TOKEN: ${{ secrets.TESTE }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "::notice:: ${{ steps.version.outputs.version }}"
@@ -44,9 +43,11 @@ jobs:
         if: github.ref == 'refs/heads/main'
 
 
-  build:
+  Backend-build-and-test:
+    needs: versionamento  #só faço o build e test se o job de versionamento for bem sucedido
     runs-on: ubuntu-latest
-    name: Build Project
+    name: Backend Build and Test Project
+
     steps:
       # Checkout código
       - name: Checkout repository
@@ -56,37 +57,22 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '8.x'
           cache: true
           cache-dependency-path: './01_WebApi/packages.lock.json'
 
-      # Restauração e compilação
-      - name: Restore and Build
+      - name: Restore
         run: |
           dotnet restore ./Fase1TechChallenge.sln
-          dotnet build --no-restore ./Fase1TechChallenge.sln
 
-  test:
-    runs-on: ubuntu-latest
-    name: Test Project
-    needs: build
-    steps:
-      # Checkout código novamente no job de teste
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # Configuração do ambiente .NET Core no job de teste
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-
-      - name: Build and test
+      - name: Build
         run: |
-          dotnet restore ./Fase1TechChallenge.sln
           dotnet build --no-restore ./Fase1TechChallenge.sln
-          dotnet test ./Fase1TechChallenge.sln --no-restore --no-build --logger trx --results-directory "TestsResults"
 
+      - name: Test
+        run: |
+          dotnet test --no-build --no-restore ./Fase1TechChallenge.sln --configuration Release --logger trx --results-directory "TestsResults"
+      
       # Upload dos resultados dos testes
       - name: Upload Test Results
         uses: actions/upload-artifact@v4

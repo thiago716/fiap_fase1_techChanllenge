@@ -9,6 +9,11 @@ on:
       - main
   workflow_dispatch:
 
+    #ELiminando conflito de branch concorrendo no workflow, assim ele cancela o mais antigo e mantem o mais novo.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
 #add controle de vercionamento
   versionamento:
@@ -78,7 +83,7 @@ jobs:
           path: TestsResults
 
   backend-lint:
-    needs: Backend-build-and-test
+    needs: versionamento
     runs-on: ubuntu-latest
     name: Backend Lint Project
     

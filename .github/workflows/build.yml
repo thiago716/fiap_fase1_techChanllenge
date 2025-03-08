@@ -116,5 +116,26 @@ jobs:
           base-ref: main
           head-ref: main
           
+  code-security-check:
+    needs: versionamento
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: github/codeql-action/init@v3
+        name: Initialize CodeQL - CSharp
+        with:
+          languages: csharp
+
+      - uses: github/codeql-action/analyze@v3
+        name: Perform CodeQL Analysis - CSharp
+        with:
+          category: "/language:csharp"
 
       

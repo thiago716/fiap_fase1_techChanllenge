@@ -20,6 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Versionamento
 
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -45,7 +48,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
 
 
-  Backend-build-and-test:
+  Backend-build-test-and-publish:
     needs: versionamento  #só faço o build e test se o job de versionamento for bem sucedido
     runs-on: ubuntu-latest
     name: Backend Build and Test Project
@@ -81,6 +84,17 @@ jobs:
         with:
           name: dotnet-test-results
           path: TestsResults
+      
+      - name: Publish
+        run: |
+          dotnet publish --no-build --no-restore --configuration Release ./Fase1TechChallenge.sln --output ./publish
+
+      - name: Upload Publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-publish
+          path: ./publish
+        
 
   backend-lint:
     needs: versionamento
@@ -151,5 +165,25 @@ jobs:
         name: Analyze code - Backend
         with:
           category: "/language:csharp"
+
+  build-docker-image:
+    needs: [versionamento, Backend-build-test-and-publish]
+    runs-on: ubuntu-latest
+
+    env:
+      version: ${{ needs.versionamento.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dotnet-publish
+          path: app
+          merge-multiple: false
+
+      - name: Build Docker image
+        run: |
+          docker build -t techchallenge-app: ${{ env.version }} app
 
       

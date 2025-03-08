@@ -83,7 +83,6 @@ jobs:
           path: TestsResults
 
   backend-lint:
-    if: false
     needs: versionamento
     runs-on: ubuntu-latest
     name: Backend Lint Project
@@ -104,7 +103,6 @@ jobs:
   
   #veirificar dependencias com vulnerabilidades conhecidas
   dependecy-check:
-    if: false  
     needs: versionamento
     runs-on: ubuntu-latest
     permissions:

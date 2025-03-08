@@ -111,5 +111,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/dependency-review-action@v4
+        with:
+          comment-summary-in-pr: always
 
       

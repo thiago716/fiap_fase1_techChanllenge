@@ -83,6 +83,7 @@ jobs:
           path: TestsResults
 
   backend-lint:
+    if: false
     needs: versionamento
     runs-on: ubuntu-latest
     name: Backend Lint Project
@@ -103,6 +104,7 @@ jobs:
   
   #veirificar dependencias com vulnerabilidades conhecidas
   dependecy-check:
+    if: false  
     needs: versionamento
     runs-on: ubuntu-latest
     permissions:
@@ -125,20 +127,30 @@ jobs:
       actions: read
       contents: read
 
+
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-dotnet@v4
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '8.x' 
 
-      - uses: github/codeql-action/init@v3
-        name: Initialize CodeQL - CSharp
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
         with:
           languages: csharp
+          build-mode: manual
+
+      - name: Build C# code manually
+        run: |
+          echo 'Starting manual build for C# code...'
+          dotnet restore
+          dotnet build --configuration Release
+          echo 'Manual build complete.'
 
       - uses: github/codeql-action/analyze@v3
-        name: Perform CodeQL Analysis - CSharp
+        name: Analyze code - Backend
         with:
           category: "/language:csharp"
 

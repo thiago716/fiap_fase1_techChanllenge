@@ -100,3 +100,14 @@ jobs:
           VALIDATE_YAML: "true"
           validate_csharp: "true"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  #veirificar dependencias com vulnerabilidades conhecidas
+  dependecy-check:
+    needs: versionamento
+    runs-on: ubuntu-latest
+    name: verificação de dependencias
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+      

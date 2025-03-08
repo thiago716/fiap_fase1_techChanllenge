@@ -116,5 +116,40 @@ jobs:
           base-ref: main
           head-ref: main
           
+  code-security-check:
+    needs: versionamento
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x' 
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: csharp
+          build-mode: manual
+
+      - name: Build C# code manually
+        run: |
+          echo 'Starting manual build for C# code...'
+          dotnet restore
+          dotnet build --configuration Release
+          echo 'Manual build complete.'
+
+      - uses: github/codeql-action/analyze@v3
+        name: Analyze code - Backend
+        with:
+          category: "/language:csharp"
 
       
